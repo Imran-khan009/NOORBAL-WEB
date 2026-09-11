@@ -62,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     if (onNavigateToConnect) {
       onNavigateToConnect();
     } else {
-      const el = document.getElementById('connect-section');
+      const el = document.getElementById('footer-channels') || document.getElementById('footer-section');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
   };

@@ -7,7 +7,6 @@ import { CategoryStrip } from './components/CategoryStrip';
 import { ProductCatalog } from './components/ProductCatalog';
 import { BalochiHeritageStory } from './components/BalochiHeritageStory';
 import { TrustBadges } from './components/TrustBadges';
-import { SocialHub } from './components/SocialHub';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { AnalyticsDrawer } from './components/AnalyticsDrawer';
@@ -115,7 +114,7 @@ export default function App() {
       window.history.pushState({}, '', window.location.pathname);
     }
     setTimeout(() => {
-      const connectEl = document.getElementById('connect-section');
+      const connectEl = document.getElementById('footer-channels') || document.getElementById('footer-section');
       if (connectEl) {
         connectEl.scrollIntoView({ behavior: 'smooth' });
       }
@@ -278,11 +277,6 @@ export default function App() {
               {/* Assurance & Trust Matrix */}
               <ScrollReveal direction="up" distance={15}>
                 <TrustBadges />
-              </ScrollReveal>
-
-              {/* CONNECT WITH NOORBAL: Dedicated Social Media Hub */}
-              <ScrollReveal direction="up" distance={20}>
-                <SocialHub />
               </ScrollReveal>
             </>
           )}

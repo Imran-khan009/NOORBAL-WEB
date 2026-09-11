@@ -44,7 +44,7 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   return (
-    <footer className="bg-[#2B231E] text-[#FAF8F5] pt-16 pb-12 border-t-2 border-[#C9A468]/40">
+    <footer id="footer-section" className="bg-[#2B231E] text-[#FAF8F5] pt-16 pb-12 border-t-2 border-[#C9A468]/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-white/10">
@@ -68,8 +68,8 @@ export const Footer: React.FC<FooterProps> = ({
               Preserving and elevating Balochi hand-embroidered artisanal luxury, royal fragrances, and prestige lifestyle accessories for women and men across Pakistan and worldwide.
             </p>
 
-            {/* Secondary Social Icons in Footer */}
-            <div className="space-y-2 pt-2">
+            {/* Official Social Channels in Footer */}
+            <div id="footer-channels" className="space-y-2 pt-2">
               <span className="text-[11px] uppercase tracking-widest text-[#DFBF88] font-semibold block">
                 Official Channels
               </span>
@@ -175,15 +175,16 @@ export const Footer: React.FC<FooterProps> = ({
               <li className="flex items-start gap-2">
                 <Sparkles className="w-4 h-4 text-[#C9A468] shrink-0 mt-0.5" />
                 <span>
-                  <strong>Connect with NOORBAL:</strong>
+                  <strong>Concierge Assistance:</strong>
                   <br />
-                  <button
-                    type="button"
-                    onClick={scrollToConnect}
+                  <a
+                    href={socialLinks.whatsapp}
+                    target="_blank"
+                    rel="noreferrer"
                     className="text-[#DFBF88] hover:underline"
                   >
-                    View Social Media Hub & Direct Channels →
-                  </button>
+                    WhatsApp: 0313 0267697 →
+                  </a>
                 </span>
               </li>
             </ul>

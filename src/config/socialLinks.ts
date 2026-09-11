@@ -18,7 +18,7 @@ export interface SocialChannel {
 export const socialLinks = {
   whatsapp: 'https://wa.me/923130267697',
   instagram: 'https://instagram.com/noorbal.official',
-  facebook: 'https://facebook.com/NOORBAL',
+  facebook: 'https://www.facebook.com/profile.php?id=61594041881263&sk=directory_personal_details',
   tiktok: 'https://www.tiktok.com/@noorbal.official',
   email: 'mailto:noorbal.offical@gmail.com',
 };
@@ -48,8 +48,8 @@ export const SOCIAL_CHANNELS: SocialChannel[] = [
     id: 'facebook',
     name: 'Facebook',
     url: socialLinks.facebook,
-    handle: 'NOORBAL',
-    description: 'Official Facebook community & heritage chronicles',
+    handle: 'NOORBAL Official',
+    description: 'Official Facebook profile & heritage community',
     accentColor: '#1877F2',
     hoverBg: 'rgba(24, 119, 242, 0.08)',
   },
