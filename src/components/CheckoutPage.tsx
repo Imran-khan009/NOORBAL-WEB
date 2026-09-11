@@ -1058,15 +1058,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
                 <div className="flex justify-between items-baseline pt-3 border-t border-[#E5DFD5]">
                   <div>
-                    <span className="font-serif text-sm font-bold text-[#2B231E]">Grand Total</span>
-                    <p className="text-[10px] text-gray-500">Includes all handling & packaging</p>
+                    <span className="font-sans text-sm font-bold text-[#2B231E]">Grand Total</span>
+                    <p className="text-[10px] text-gray-500 font-sans">Includes all handling & packaging</p>
                   </div>
                   <div className="text-right">
-                    <span className="font-serif text-lg sm:text-xl font-bold text-[#2B231E]">
+                    <span className="font-sans text-lg sm:text-xl font-bold text-[#2B231E]">
                       {formatPrice(grandTotalPKR, currency)}
                     </span>
                     {currency !== 'PKR' && (
-                      <p className="text-[10px] text-gray-400">
+                      <p className="text-[10px] text-gray-400 font-sans">
                         (PKR {grandTotalPKR.toLocaleString()})
                       </p>
                     )}

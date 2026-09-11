@@ -59,24 +59,24 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
               <span>Saved to Supabase Database</span>
             </div>
 
-            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2B231E] pt-1">
+            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium sm:font-semibold text-[#2B231E] pt-1">
               Order Confirmed &amp; Recorded
             </h1>
-            <p className="text-sm sm:text-base text-[#8D7B68] max-w-xl mx-auto">
+            <p className="text-sm sm:text-base text-[#8D7B68] font-sans max-w-xl mx-auto leading-relaxed">
               Your order has been written directly to the NOORBAL Supabase database and assigned an official atelier reference number.
             </p>
           </div>
 
           {/* Prominent Order Number Badge */}
           <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-5 py-3 rounded-2xl bg-[#FAF8F5] border border-[#E5DFD5]">
-            <span className="text-xs text-gray-500 font-medium">Order Number:</span>
-            <span className="font-serif text-lg sm:text-xl font-bold text-[#2B231E] tracking-wider">
+            <span className="text-xs font-sans text-gray-500 font-medium">Order Number:</span>
+            <span className="font-mono text-lg sm:text-xl font-bold text-[#2B231E] tracking-wider">
               {order.id}
             </span>
             <button
               type="button"
               onClick={handleCopyOrderId}
-              className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-[#2B231E] rounded-md hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-sans text-gray-500 hover:text-[#2B231E] rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
               title="Copy Order ID"
             >
               {isCopied ? (
@@ -137,10 +137,10 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
         <div className="bg-white rounded-2xl border border-[#E5DFD5] p-6 sm:p-8 shadow-sm space-y-6">
           
           <div className="flex items-center justify-between pb-4 border-b border-[#E5DFD5]">
-            <h2 className="font-serif text-lg sm:text-xl font-bold text-[#2B231E]">
+            <h2 className="font-serif text-lg sm:text-xl font-medium sm:font-semibold text-[#2B231E]">
               Order Summary &amp; Status
             </h2>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-semibold bg-amber-50 text-amber-800 border border-amber-200">
               <Clock className="w-3.5 h-3.5" />
               <span>Status: {order.orderStatus}</span>
             </span>
@@ -160,21 +160,21 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
               </div>
 
               <div className="space-y-1">
-                <h3 className="font-serif text-sm font-bold text-[#2B231E]">
+                <h3 className="font-serif text-sm font-medium sm:font-semibold text-[#2B231E]">
                   {order.item.productName}
                 </h3>
-                <p className="text-xs text-[#8D7B68]">
+                <p className="text-xs text-[#8D7B68] font-sans">
                   Product ID: <span className="font-mono text-[#2B231E]">{order.item.productId}</span> · Size: <strong className="text-[#2B231E]">{order.item.size}</strong> · Qty: <strong className="text-[#2B231E]">{order.item.quantity}</strong>
                 </p>
-                <p className="text-[11px] text-gray-500">
+                <p className="text-[11px] text-gray-500 font-sans">
                   {order.orderType === 'ready-stock' ? 'Ready-Stock (2–3 Days Express)' : 'Made-to-Order Heirloom'}
                 </p>
               </div>
             </div>
 
             <div className="sm:text-right w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200">
-              <span className="text-xs text-gray-500 block">Total Item Amount</span>
-              <span className="font-serif text-base sm:text-lg font-bold text-[#2B231E]">
+              <span className="text-xs text-gray-500 font-sans block">Total Item Amount</span>
+              <span className="font-sans text-base sm:text-lg font-bold text-[#2B231E]">
                 {formatPrice(order.totalPKR, currency)}
               </span>
             </div>

@@ -48,9 +48,18 @@ export interface WishlistItem {
   addedAt: number;
 }
 
+export interface CartItem {
+  id: string;
+  product: Product;
+  size: string;
+  quantity: number;
+  color?: string;
+  addedAt: number;
+}
+
 export interface AnalyticsEvent {
   id: string;
-  type: 'page_view' | 'product_view' | 'whatsapp_click' | 'instagram_click' | 'category_filter' | 'wishlist_add' | 'currency_change' | 'checkout_started' | 'order_placed';
+  type: 'page_view' | 'product_view' | 'whatsapp_click' | 'instagram_click' | 'category_filter' | 'wishlist_add' | 'cart_add' | 'cart_remove' | 'currency_change' | 'checkout_started' | 'order_placed';
   timestamp: string;
   details: string;
   productId?: string;

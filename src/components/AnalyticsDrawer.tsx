@@ -25,6 +25,18 @@ export const AnalyticsDrawer: React.FC<AnalyticsDrawerProps> = ({
     return () => window.removeEventListener('noorbal:analytics_updated', handleUpdate);
   }, []);
 
+  // Lock body scroll when drawer is active
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const totalPageViews = events.filter((e) => e.type === 'page_view').length || 1;
@@ -40,19 +52,25 @@ export const AnalyticsDrawer: React.FC<AnalyticsDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm animate-in fade-in">
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-[#2B231E] text-white shadow-2xl border-l border-[#C9A468]/30 flex flex-col justify-between">
+    <div 
+      className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs animate-in fade-in"
+      onClick={onClose}
+    >
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-3 sm:pl-10">
+        <div 
+          className="w-screen max-w-md bg-[#2B231E] text-white shadow-2xl border-l border-[#C9A468]/30 flex flex-col justify-between"
+          onClick={(e) => e.stopPropagation()}
+        >
           
           {/* Header */}
-          <div className="p-5 border-b border-white/10 flex items-center justify-between bg-[#382E28]">
+          <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-[#382E28]">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-[#C9A468]" />
+              <BarChart3 className="w-5 h-5 text-[#C9A468] shrink-0" />
               <div>
-                <h3 className="font-serif text-lg font-bold text-white">
+                <h3 className="font-serif text-base sm:text-lg font-medium sm:font-semibold text-white">
                   NOORBAL Business Intelligence
                 </h3>
-                <p className="text-[10px] text-[#DFBF88] uppercase tracking-widest">
+                <p className="text-[10px] text-[#DFBF88] font-sans uppercase tracking-widest font-medium">
                   Live Conversion & Activity Funnel
                 </p>
               </div>
@@ -61,59 +79,60 @@ export const AnalyticsDrawer: React.FC<AnalyticsDrawerProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-full hover:bg-white/10 text-white/80 hover:text-white"
+              className="w-10 h-10 rounded-full hover:bg-white/10 text-white/80 hover:text-white flex items-center justify-center active:scale-90 transition-all shrink-0 cursor-pointer"
+              aria-label="Close analytics"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Metrics Overview */}
-          <div className="p-5 overflow-y-auto flex-1 space-y-5">
+          <div className="p-5 overflow-y-auto flex-1 space-y-5 font-sans">
             
             {/* KPI Cards */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3.5 rounded-xl bg-white/5 border border-white/10">
-                <div className="flex items-center justify-between text-[#DFBF88] text-xs">
+                <div className="flex items-center justify-between text-[#DFBF88] text-xs font-sans">
                   <span>Product Views</span>
                   <Eye className="w-4 h-4 text-[#C9A468]" />
                 </div>
-                <div className="font-serif text-2xl font-bold mt-1 text-white">
+                <div className="font-sans text-2xl font-bold mt-1 text-white">
                   {totalProductViews}
                 </div>
-                <p className="text-[10px] text-white/50 mt-0.5">Customer product clicks</p>
+                <p className="text-[10px] text-white/50 mt-0.5 font-sans">Customer product clicks</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-white/5 border border-white/10">
-                <div className="flex items-center justify-between text-[#25D366] text-xs">
+                <div className="flex items-center justify-between text-[#25D366] text-xs font-sans">
                   <span>WhatsApp Inquiries</span>
                   <MessageCircle className="w-4 h-4" />
                 </div>
-                <div className="font-serif text-2xl font-bold mt-1 text-white">
+                <div className="font-sans text-2xl font-bold mt-1 text-white">
                   {totalWhatsAppClicks}
                 </div>
-                <p className="text-[10px] text-white/50 mt-0.5">High-intent conversions</p>
+                <p className="text-[10px] text-white/50 mt-0.5 font-sans">High-intent conversions</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-white/5 border border-white/10">
-                <div className="flex items-center justify-between text-[#C9A468] text-xs">
+                <div className="flex items-center justify-between text-[#C9A468] text-xs font-sans">
                   <span>Conversion Rate</span>
                   <TrendingUp className="w-4 h-4" />
                 </div>
-                <div className="font-serif text-2xl font-bold mt-1 text-white">
+                <div className="font-sans text-2xl font-bold mt-1 text-white">
                   {conversionRate}%
                 </div>
-                <p className="text-[10px] text-white/50 mt-0.5">View-to-WhatsApp intent</p>
+                <p className="text-[10px] text-white/50 mt-0.5 font-sans">View-to-WhatsApp intent</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-white/5 border border-white/10">
-                <div className="flex items-center justify-between text-sky-400 text-xs">
+                <div className="flex items-center justify-between text-sky-400 text-xs font-sans">
                   <span>Session Events</span>
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <div className="font-serif text-2xl font-bold mt-1 text-white">
+                <div className="font-sans text-2xl font-bold mt-1 text-white">
                   {events.length}
                 </div>
-                <p className="text-[10px] text-white/50 mt-0.5">Recorded user triggers</p>
+                <p className="text-[10px] text-white/50 mt-0.5 font-sans">Recorded user triggers</p>
               </div>
             </div>
 

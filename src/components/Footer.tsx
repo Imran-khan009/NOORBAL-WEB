@@ -55,12 +55,12 @@ export const Footer: React.FC<FooterProps> = ({
               <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-[#C9A468]/50 flex items-center justify-center bg-[#221C18]">
                 <NoorbalLogo size="100%" className="w-full h-full" alt="NOORBAL Logo" />
               </div>
-              <span className="font-serif text-2xl font-bold tracking-[0.2em] text-[#FAF8F5]">
+              <span className="font-serif text-2xl font-medium sm:font-semibold tracking-[0.2em] text-[#FAF8F5]">
                 NOORBAL
               </span>
             </div>
 
-            <p className="text-xs tracking-[0.25em] uppercase text-[#DFBF88] font-medium">
+            <p className="text-xs tracking-[0.25em] uppercase text-[#DFBF88] font-sans font-medium">
               Light · Heritage · Softness
             </p>
 
@@ -70,7 +70,7 @@ export const Footer: React.FC<FooterProps> = ({
 
             {/* Official Social Channels in Footer */}
             <div id="footer-channels" className="space-y-2 pt-2">
-              <span className="text-[11px] uppercase tracking-widest text-[#DFBF88] font-semibold block">
+              <span className="text-[11px] uppercase tracking-widest text-[#DFBF88] font-sans font-semibold block">
                 Official Channels
               </span>
               <div className="flex flex-wrap items-center gap-2">
@@ -96,15 +96,15 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           {/* Quick Collections */}
-          <div className="lg:col-span-2 space-y-3">
-            <h4 className="font-serif text-sm font-bold text-[#DFBF88] uppercase tracking-wider">
+          <div className="lg:col-span-2 space-y-3 font-sans">
+            <h4 className="font-serif text-sm font-medium uppercase tracking-wider text-[#DFBF88]">
               Collections
             </h4>
-            <ul className="space-y-2 text-xs text-white/80">
+            <ul className="space-y-2 text-xs text-white/80 font-sans">
               <li>
                 <button 
                   onClick={() => onSelectCategory('balochi-heritage')} 
-                  className="hover:text-[#C9A468] transition-colors text-left"
+                  className="hover:text-[#C9A468] transition-colors text-left cursor-pointer"
                 >
                   Balochi Heritage
                 </button>
@@ -112,7 +112,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button 
                   onClick={() => onSelectCategory('men')} 
-                  className="hover:text-[#C9A468] transition-colors text-left"
+                  className="hover:text-[#C9A468] transition-colors text-left cursor-pointer"
                 >
                   Men’s Wear
                 </button>
@@ -120,7 +120,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button 
                   onClick={() => onSelectCategory('perfumes')} 
-                  className="hover:text-[#C9A468] transition-colors text-left"
+                  className="hover:text-[#C9A468] transition-colors text-left cursor-pointer"
                 >
                   Royal Fragrances
                 </button>
@@ -128,7 +128,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button 
                   onClick={() => onSelectCategory('watches')} 
-                  className="hover:text-[#C9A468] transition-colors text-left"
+                  className="hover:text-[#C9A468] transition-colors text-left cursor-pointer"
                 >
                   Moonphase Horology
                 </button>
@@ -136,7 +136,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button 
                   onClick={() => onSelectCategory('caps')} 
-                  className="hover:text-[#C9A468] transition-colors text-left"
+                  className="hover:text-[#C9A468] transition-colors text-left cursor-pointer"
                 >
                   Signature Caps
                 </button>
@@ -144,7 +144,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button 
                   onClick={() => onSelectCategory('shoes')} 
-                  className="hover:text-[#C9A468] transition-colors text-left"
+                  className="hover:text-[#C9A468] transition-colors text-left cursor-pointer"
                 >
                   Artisan Footwear
                 </button>
@@ -153,11 +153,11 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           {/* Customer Service & Policies */}
-          <div className="lg:col-span-3 space-y-3">
-            <h4 className="font-serif text-sm font-bold text-[#DFBF88] uppercase tracking-wider">
+          <div className="lg:col-span-3 space-y-3 font-sans">
+            <h4 className="font-serif text-sm font-medium uppercase tracking-wider text-[#DFBF88]">
               Assurance & Policies
             </h4>
-            <ul className="space-y-2.5 text-xs text-white/80">
+            <ul className="space-y-2.5 text-xs text-white/80 font-sans">
               <li className="flex items-start gap-2">
                 <Truck className="w-4 h-4 text-[#C9A468] shrink-0 mt-0.5" />
                 <span>
@@ -191,11 +191,11 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           {/* Newsletter / Exclusive Drops */}
-          <div className="lg:col-span-3 space-y-3">
-            <h4 className="font-serif text-sm font-bold text-[#DFBF88] uppercase tracking-wider">
+          <div className="lg:col-span-3 space-y-3 font-sans">
+            <h4 className="font-serif text-sm font-medium uppercase tracking-wider text-[#DFBF88]">
               Exclusive VIP Drops
             </h4>
-            <p className="text-xs text-white/70">
+            <p className="text-xs text-white/70 font-sans">
               Be the first to receive notifications about limited Balochi hand-embroidered releases and bespoke seasonal drops.
             </p>
 
@@ -207,19 +207,19 @@ export const Footer: React.FC<FooterProps> = ({
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full py-2.5 pl-3 pr-10 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#C9A468] transition-colors"
+                  className="w-full py-2.5 pl-3 pr-10 text-xs bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#C9A468] transition-colors font-sans"
                 />
                 <button
                   type="submit"
                   aria-label="Subscribe to VIP newsletter"
-                  className="absolute right-1.5 top-1.5 p-1.5 bg-[#C9A468] text-[#2B231E] rounded-md hover:bg-[#DFBF88] transition-all transform active:scale-90"
+                  className="absolute right-1.5 top-1.5 p-1.5 bg-[#C9A468] text-[#2B231E] rounded-md hover:bg-[#DFBF88] transition-all transform active:scale-90 cursor-pointer"
                 >
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {subscribed && (
-                <p className="text-[11px] text-[#25D366] flex items-center gap-1 font-medium">
+                <p className="text-[11px] text-[#25D366] flex items-center gap-1 font-medium font-sans">
                   <Check className="w-3.5 h-3.5" />
                   <span>Welcome to NOORBAL VIP!</span>
                 </p>
