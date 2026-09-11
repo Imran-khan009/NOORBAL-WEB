@@ -1,0 +1,30 @@
+# ==============================================================================
+# NOORBAL — Production Netlify Configuration
+# Framework: React + Vite
+# ==============================================================================
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Single-Page Application (SPA) redirect rule
+# Ensures refreshing any path (e.g. /checkout, /order, /track) loads /index.html cleanly without 404
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security and caching headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache Vite bundled assets (JS/CSS/hashed images) for optimal loading performance
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

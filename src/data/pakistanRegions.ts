@@ -1,0 +1,118 @@
+export interface ProvinceData {
+  id: string;
+  name: string;
+  popularCities: string[];
+}
+
+export const PAKISTAN_PROVINCES: ProvinceData[] = [
+  {
+    id: 'punjab',
+    name: 'Punjab',
+    popularCities: [
+      'Lahore',
+      'Rawalpindi',
+      'Faisalabad',
+      'Multan',
+      'Gujranwala',
+      'Sialkot',
+      'Bahawalpur',
+      'Sargodha',
+      'Sheikhupura',
+      'Gujrat',
+      'Sahiwal',
+      'Jhelum',
+      'Rahim Yar Khan',
+      'Kasur',
+      'Okara',
+      'Other City',
+    ],
+  },
+  {
+    id: 'sindh',
+    name: 'Sindh',
+    popularCities: [
+      'Karachi',
+      'Hyderabad',
+      'Sukkur',
+      'Larkana',
+      'Mirpur Khas',
+      'Nawabshah',
+      'Thatta',
+      'Badin',
+      'Jacobabad',
+      'Shikarpur',
+      'Khairpur',
+      'Other City',
+    ],
+  },
+  {
+    id: 'balochistan',
+    name: 'Balochistan',
+    popularCities: [
+      'Quetta',
+      'Gwadar',
+      'Turbat',
+      'Khuzdar',
+      'Chaman',
+      'Hub',
+      'Sibi',
+      'Zhob',
+      'Loralai',
+      'Dera Murad Jamali',
+      'Pishin',
+      'Kharan',
+      'Other City',
+    ],
+  },
+  {
+    id: 'khyber-pakhtunkhwa',
+    name: 'Khyber Pakhtunkhwa',
+    popularCities: [
+      'Peshawar',
+      'Mardan',
+      'Abbottabad',
+      'Swat (Mingora)',
+      'Kohat',
+      'Dera Ismail Khan',
+      'Haripur',
+      'Mansehra',
+      'Bannu',
+      'Nowshera',
+      'Charsadda',
+      'Other City',
+    ],
+  },
+  {
+    id: 'islamabad',
+    name: 'Islamabad Capital Territory',
+    popularCities: [
+      'Islamabad',
+    ],
+  },
+  {
+    id: 'azad-kashmir',
+    name: 'Azad Jammu & Kashmir',
+    popularCities: [
+      'Muzaffarabad',
+      'Mirpur',
+      'Rawalakot',
+      'Kotli',
+      'Bhimber',
+      'Bagh',
+      'Other City',
+    ],
+  },
+  {
+    id: 'gilgit-baltistan',
+    name: 'Gilgit-Baltistan',
+    popularCities: [
+      'Gilgit',
+      'Skardu',
+      'Hunza (Karimabad)',
+      'Diamer (Chilas)',
+      'Ghizer',
+      'Ghanche',
+      'Other City',
+    ],
+  },
+];

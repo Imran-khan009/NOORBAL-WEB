@@ -1,0 +1,6 @@
+{
+  "name": "NOORBAL",
+  "description": "Discover NOORBAL: Premium Balochi hand-embroidered fashion, signature fragrances, watches, and refined lifestyle accessories. 2-3 Days Delivery & 7-Day Warranty.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
