@@ -17,6 +17,7 @@ import { CURRENCIES } from '../utils/currency';
 import { NOORBAL_CONTACT } from '../utils/whatsapp';
 import { socialLinks } from '../config/socialLinks';
 import { WhatsAppBrandIcon } from './SocialIcons';
+import { NoorbalLogo } from './NoorbalLogo';
 
 interface NavbarProps {
   currentCurrency: CurrencyCode;
@@ -128,9 +129,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={handleHomeClick}
           >
             <div className="flex items-center gap-2.5">
-              {/* Crescent Gold Emblem with Subtle Hover Effect */}
-              <div className="w-8 h-8 rounded-full bg-[#2B231E] flex items-center justify-center text-[#C9A468] shadow-sm border border-[#C9A468]/50 group-hover:border-[#C9A468] group-hover:scale-105 transition-all duration-300">
-                <span className="font-serif text-lg font-bold">ن</span>
+              {/* Official NOORBAL Golden Crescent Logo */}
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden shadow-sm border border-[#C9A468]/60 group-hover:border-[#C9A468] group-hover:scale-105 transition-all duration-300 flex items-center justify-center bg-[#221C18]">
+                <NoorbalLogo size="100%" className="w-full h-full" alt="NOORBAL Luxury Logo" />
               </div>
               <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.22em] text-[#2B231E] group-hover:text-[#1A1512] transition-colors">
                 NOORBAL

@@ -9,6 +9,7 @@ import {
 import { socialLinks, SOCIAL_CHANNELS } from '../config/socialLinks';
 import { getPlatformIcon } from './SocialIcons';
 import { NOORBAL_CONTACT } from '../utils/whatsapp';
+import { NoorbalLogo } from './NoorbalLogo';
 
 interface FooterProps {
   onSelectCategory: (categoryId: string) => void;
@@ -50,9 +51,9 @@ export const Footer: React.FC<FooterProps> = ({
           
           {/* Brand Identity */}
           <div className="lg:col-span-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#FAF8F5] flex items-center justify-center text-[#2B231E] shadow-sm">
-                <span className="font-serif text-lg font-bold">ن</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm border border-[#C9A468]/50 flex items-center justify-center bg-[#221C18]">
+                <NoorbalLogo size="100%" className="w-full h-full" alt="NOORBAL Logo" />
               </div>
               <span className="font-serif text-2xl font-bold tracking-[0.2em] text-[#FAF8F5]">
                 NOORBAL
