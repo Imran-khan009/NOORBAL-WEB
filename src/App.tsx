@@ -11,7 +11,7 @@ import { TrustBadges } from './components/TrustBadges';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { WishlistDrawer } from './components/WishlistDrawer';
 import { CartDrawer } from './components/CartDrawer';
-import { AnalyticsDrawer } from './components/AnalyticsDrawer';
+import { AdminDashboard } from './components/AdminDashboard';
 import { SearchModal } from './components/SearchModal';
 import { FloatingWhatsAppCTA } from './components/FloatingWhatsAppCTA';
 import { BottomNavigation } from './components/BottomNavigation';
@@ -50,8 +50,16 @@ export default function App() {
   const [activeModalProduct, setActiveModalProduct] = useState<Product | null>(null);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Dedicated Admin Route State
+  const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return (
+      window.location.pathname.startsWith('/admin') ||
+      window.location.hash.startsWith('#admin')
+    );
+  });
 
   // Dedicated Checkout & Order State
   const [checkoutItem, setCheckoutItem] = useState<CheckoutItem | null>(null);
@@ -75,18 +83,40 @@ export default function App() {
     }
   }, [cart]);
 
-  // Handle browser popstate for back button
+  // Handle browser popstate and hashchange
   useEffect(() => {
-    const handlePopState = () => {
+    const handleRouteSync = () => {
       const hash = window.location.hash;
+      const path = window.location.pathname;
+      
+      const adminActive = path.startsWith('/admin') || hash.startsWith('#admin');
+      setIsAdminRoute(adminActive);
+
       if (!hash.includes('checkout') && !hash.includes('order-confirmed')) {
         setCheckoutItem(null);
         setConfirmedOrder(null);
       }
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+
+    window.addEventListener('popstate', handleRouteSync);
+    window.addEventListener('hashchange', handleRouteSync);
+    return () => {
+      window.removeEventListener('popstate', handleRouteSync);
+      window.removeEventListener('hashchange', handleRouteSync);
+    };
   }, []);
+
+  const handleNavigateToAdmin = () => {
+    setIsAdminRoute(true);
+    window.history.pushState({ view: 'admin' }, '', '#admin');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackFromAdmin = () => {
+    setIsAdminRoute(false);
+    window.history.pushState({}, '', window.location.pathname.replace(/^\/admin/, '') || '#');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Track initial page view
   useEffect(() => {
@@ -306,6 +336,11 @@ export default function App() {
     }, 50);
   };
 
+  // Isolated Protected Admin Experience
+  if (isAdminRoute) {
+    return <AdminDashboard onBackToStore={handleBackFromAdmin} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#2B231E] relative selection:bg-[#C9A468]/30 pb-16 sm:pb-0">
       
@@ -320,7 +355,6 @@ export default function App() {
         cartCount={cart.reduce((sum, i) => sum + i.quantity, 0)}
         onOpenWishlist={() => setIsWishlistOpen(true)}
         onOpenCart={() => setIsCartOpen(true)}
-        onOpenAnalytics={() => setIsAnalyticsOpen(true)}
         onSelectCategory={handleSelectCategory}
         onOpenSearch={() => setIsSearchOpen(true)}
         onNavigateToStory={handleNavigateToStory}
@@ -403,6 +437,7 @@ export default function App() {
         onSelectCategory={handleSelectCategory}
         onNavigateToStory={handleNavigateToStory}
         onNavigateToConnect={handleNavigateToConnect}
+        onNavigateToAdmin={handleNavigateToAdmin}
       />
 
       {/* Persistent Floating WhatsApp Concierge Support (Safe above mobile bottom nav) */}
@@ -460,12 +495,6 @@ export default function App() {
         onRemoveFromWishlist={(id) => setWishlist(wishlist.filter((w) => w.id !== id))}
         onQuickView={handleQuickView}
         onOrderSingle={(prod) => handleInitiateCheckout(prod)}
-      />
-
-      {/* Live Business Intelligence / Analytics Drawer */}
-      <AnalyticsDrawer
-        isOpen={isAnalyticsOpen}
-        onClose={() => setIsAnalyticsOpen(false)}
       />
 
       {/* Live Search Modal (Screen 9 Style) */}

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { CheckoutItem, CustomerInfo, CurrencyCode, Order } from '../types';
 import { PAKISTAN_PROVINCES } from '../data/pakistanRegions';
 import { formatPrice } from '../utils/currency';
-import { buildSupabaseOrderPayload, mapSupabaseRowToOrder, generateOrderNumber } from '../utils/orders';
-import { insertOrderToSupabase, SUPABASE_CONFIG, SUPABASE_ORDERS_SQL } from '../lib/supabase';
+import { generateOrderNumber } from '../utils/orders';
 import { buildOrderInquiryWhatsAppUrl } from '../utils/whatsapp';
 import { WhatsAppIcon } from './WhatsAppIcon';
 import { 
@@ -17,11 +16,7 @@ import {
   Sparkles,
   Edit3,
   ShoppingBag,
-  Database,
-  AlertTriangle,
-  Copy,
-  ExternalLink,
-  X
+  AlertTriangle
 } from 'lucide-react';
 
 interface CheckoutPageProps {
@@ -47,11 +42,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<{
     message: string;
-    details?: string;
-    isTableMissing?: boolean;
   } | null>(null);
-  const [showSqlModal, setShowSqlModal] = useState(false);
-  const [sqlCopied, setSqlCopied] = useState(false);
 
   // Form State
   const [customer, setCustomer] = useState<CustomerInfo>({
@@ -176,32 +167,68 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     };
 
     const orderNumber = generateOrderNumber();
-    const supabasePayload = buildSupabaseOrderPayload(
-      finalItem,
-      finalCustomerInfo,
-      deliveryFeePKR,
-      orderNumber
-    );
 
-    // CRITICAL: Submit order directly into Supabase database first
-    const result = await insertOrderToSupabase(supabasePayload);
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          item: {
+            productId: finalItem.product.id,
+            productName: finalItem.product.name,
+            variant: finalItem.product.subtitle,
+            size: finalItem.size || 'Standard',
+            quantity: finalItem.quantity,
+            unitPricePKR: finalItem.product.pricePKR,
+            heroImage: finalItem.product.heroImage,
+            customMeasurements: finalItem.customMeasurements,
+          },
+          customer: finalCustomerInfo,
+          deliveryFeePKR,
+          orderNumber,
+        }),
+      });
 
-    if (!result.success || !result.data) {
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to process order.');
+      }
+
+      const savedOrder: Order = {
+        id: data.order?.id || orderNumber,
+        supabaseId: data.order?.supabaseId,
+        item: {
+          productId: finalItem.product.id,
+          productName: finalItem.product.name,
+          variant: finalItem.product.subtitle,
+          size: finalItem.size || 'Standard',
+          quantity: finalItem.quantity,
+          unitPricePKR: finalItem.product.pricePKR,
+          subtotalPKR: finalItem.product.pricePKR * finalItem.quantity,
+          heroImage: finalItem.product.heroImage,
+          status: finalItem.product.status,
+          customMeasurements: finalItem.customMeasurements,
+        },
+        deliveryFeePKR,
+        totalPKR: finalItem.product.pricePKR * finalItem.quantity + deliveryFeePKR,
+        customer: finalCustomerInfo,
+        orderType: finalItem.product.status,
+        orderStatus: 'Pending',
+        createdAt: data.order?.createdAt || new Date().toISOString(),
+      };
+
+      setIsSubmitting(false);
+      onOrderPlaced(savedOrder);
+    } catch (err: any) {
       setIsSubmitting(false);
       setSubmissionError({
         message:
-          result.error?.message ||
-          'Failed to record order in Supabase database. Please verify connection and retry.',
-        details: result.error?.details,
-        isTableMissing: result.error?.isTableMissing,
+          'We were unable to complete your order right now. Please check your network connection or message our concierge on WhatsApp to place your order directly.',
       });
-      return;
     }
-
-    // Only after successful database insertion, show the Order Confirmation / Order Number
-    const savedOrder = mapSupabaseRowToOrder(result.data, finalItem, finalCustomerInfo);
-    setIsSubmitting(false);
-    onOrderPlaced(savedOrder);
   };
 
   return (
@@ -229,17 +256,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-[#8D7B68]">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-medium">
-              <Database className="w-3 h-3 text-emerald-600" />
-              <span className="hidden sm:inline">Supabase</span>
-              <span className="font-mono text-[10px] text-emerald-700 font-semibold">alqcxfrwzklpygkegwih</span>
-            </span>
-            <span className="hidden md:inline text-gray-300">|</span>
-            <div className="hidden md:flex items-center gap-1 text-[#8D7B68]">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#C9A468]" />
-              <span>RLS Protected</span>
-            </div>
+          <div className="flex items-center gap-1.5 text-xs text-[#8D7B68]">
+            <ShieldCheck className="w-4 h-4 text-[#C9A468]" />
+            <span className="text-[11px] font-medium hidden sm:inline">Secure Checkout</span>
           </div>
 
         </div>
@@ -825,70 +844,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     <ShieldCheck className="w-5 h-5 text-[#C9A468] shrink-0" />
                   </div>
 
-                  {/* Supabase Persistence & Security Banner */}
-                  <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <Database className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <div>
-                        <span className="font-semibold text-emerald-950 block">Direct Supabase Storage</span>
-                        <span className="text-[11px] text-emerald-800">
-                          Data persists directly into project <code className="bg-emerald-100 px-1 py-0.5 rounded font-mono font-semibold">alqcxfrwzklpygkegwih</code>
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowSqlModal(true)}
-                      className="text-[11px] text-emerald-700 hover:text-emerald-950 font-semibold underline shrink-0 cursor-pointer"
-                    >
-                      View SQL
-                    </button>
-                  </div>
-
-                  {/* Supabase Submission Error Alert */}
+                  {/* Submission Error Alert */}
                   {submissionError && (
-                    <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-900 space-y-2.5 text-xs">
+                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1 text-xs">
                       <div className="flex items-start gap-2.5">
-                        <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                        <div className="space-y-1">
-                          <p className="font-bold text-red-900">Database Insertion Failed</p>
-                          <p className="text-red-800 text-[11px] leading-relaxed">
-                            {submissionError.message}
-                          </p>
-                          {submissionError.details && (
-                            <p className="text-red-700 font-mono text-[10px] bg-red-100/70 p-1.5 rounded">
-                              {submissionError.details}
-                            </p>
-                          )}
-                        </div>
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                        <p className="text-amber-800 text-xs leading-relaxed">
+                          {submissionError.message}
+                        </p>
                       </div>
-
-                      {submissionError.isTableMissing && (
-                        <div className="pt-2 border-t border-red-200 text-[11px] space-y-2">
-                          <p className="text-gray-700">
-                            The <code className="bg-white px-1.5 py-0.5 rounded font-bold border border-red-200 text-red-900">orders</code> table does not exist in your Supabase project yet.
-                          </p>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setShowSqlModal(true)}
-                              className="px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
-                            >
-                              <Copy className="w-3.5 h-3.5" />
-                              <span>View / Copy SQL Schema</span>
-                            </button>
-                            <a
-                              href={`https://supabase.com/dashboard/project/${SUPABASE_CONFIG.projectId}/sql/new`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-semibold text-xs transition-colors flex items-center gap-1"
-                            >
-                              <span>Open Supabase SQL Editor</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
 
@@ -905,7 +869,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     {isSubmitting ? (
                       <span className="inline-flex items-center gap-2">
                         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Saving to Supabase Database...</span>
+                        <span>Placing Your Order...</span>
                       </span>
                     ) : (
                       <>
@@ -1095,100 +1059,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
         </div>
 
       </main>
-
-      {/* SQL Setup Modal */}
-      {showSqlModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-[#E5DFD5] overflow-hidden">
-            
-            {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-[#E5DFD5] flex items-center justify-between bg-[#FAF8F5]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold">
-                  <Database className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="font-serif text-base font-bold text-[#2B231E]">
-                    Supabase Database Orders Schema
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    Project: <span className="font-mono text-gray-700 font-semibold">{SUPABASE_CONFIG.projectId}</span>
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSqlModal(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs">
-              <p className="text-gray-600 leading-relaxed">
-                If the <code className="bg-gray-100 px-1 py-0.5 rounded font-mono text-[#2B231E] font-semibold">orders</code> table has not been created yet in your Supabase dashboard, copy and execute this SQL script in your Supabase SQL Editor:
-              </p>
-
-              <div className="relative">
-                <pre className="p-4 rounded-xl bg-[#1E1B18] text-[#DFBF88] font-mono text-[11px] overflow-x-auto max-h-64 leading-relaxed select-all">
-                  {SUPABASE_ORDERS_SQL}
-                </pre>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(SUPABASE_ORDERS_SQL);
-                    setSqlCopied(true);
-                    setTimeout(() => setSqlCopied(false), 2000);
-                  }}
-                  className="absolute top-2.5 right-2.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  {sqlCopied ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-400">Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy SQL</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] space-y-1">
-                <strong className="block font-semibold">Security &amp; RLS Protection:</strong>
-                <span>
-                  This schema enables Row Level Security (RLS) and grants public customers safe insertion capabilities while keeping customer personal data strictly protected.
-                </span>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-[#E5DFD5] bg-[#FAF8F5] flex flex-wrap items-center justify-between gap-2">
-              <a
-                href={`https://supabase.com/dashboard/project/${SUPABASE_CONFIG.projectId}/sql/new`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2B231E] text-white text-xs font-semibold hover:bg-[#3D322B] transition-colors"
-              >
-                <span>Open in Supabase SQL Editor</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-              <button
-                type="button"
-                onClick={() => setShowSqlModal(false)}
-                className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 text-xs font-semibold hover:bg-gray-100 cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
 
     </div>
   );

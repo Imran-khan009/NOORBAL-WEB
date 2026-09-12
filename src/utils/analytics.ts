@@ -1,38 +1,38 @@
 import { AnalyticsEvent } from '../types';
 
-const STORAGE_KEY = 'noorbal_analytics_events';
-
-export function getStoredEvents(): AnalyticsEvent[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
+/**
+ * Client-Side Anonymous Activity Beacon
+ * Strictly dispatches privacy-compliant event beacons to the protected server endpoint.
+ * Zero analytics or BI metrics are exposed or persisted in client-side storage.
+ */
 export function trackEvent(
-  type: AnalyticsEvent['type'],
+  type: AnalyticsEvent['type'] | string,
   details: string,
   extra?: { productId?: string; productName?: string }
 ): void {
-  const newEvent: AnalyticsEvent = {
-    id: 'evt_' + Math.random().toString(36).substring(2, 9),
-    type,
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-    details,
-    productId: extra?.productId,
-    productName: extra?.productName,
-  };
-
   try {
-    const current = getStoredEvents();
-    const updated = [newEvent, ...current].slice(0, 50); // Keep last 50 events
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    // Dispatch custom event for real-time reactivity in UI
-    window.dispatchEvent(new CustomEvent('noorbal:analytics_updated'));
-  } catch (err) {
-    console.warn('Could not store analytics event', err);
+    const payload = {
+      type,
+      details,
+      productId: extra?.productId,
+      productName: extra?.productName,
+      referrer: typeof document !== 'undefined' ? document.referrer : '',
+      path: typeof window !== 'undefined' ? (window.location.pathname + window.location.hash) : '',
+    };
+
+    if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      navigator.sendBeacon('/api/analytics/event', blob);
+    } else {
+      fetch('/api/analytics/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch(() => {});
+    }
+  } catch {
+    // Fail silently — never break customer experience
   }
 }
+

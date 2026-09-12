@@ -9,12 +9,10 @@ import {
   MapPin, 
   Phone, 
   ArrowRight, 
-  ShieldCheck, 
-  Database,
-  Copy,
-  Check,
-  Mail,
-  FileText
+  Copy, 
+  Check, 
+  Mail, 
+  FileText 
 } from 'lucide-react';
 
 interface OrderConfirmationPageProps {
@@ -55,15 +53,15 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
 
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-              <Database className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Saved to Supabase Database</span>
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Order Received</span>
             </div>
 
             <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-medium sm:font-semibold text-[#2B231E] pt-1">
-              Order Confirmed &amp; Recorded
+              Order Placed Successfully
             </h1>
             <p className="text-sm sm:text-base text-[#8D7B68] font-sans max-w-xl mx-auto leading-relaxed">
-              Your order has been written directly to the NOORBAL Supabase database and assigned an official atelier reference number.
+              Thank you for choosing NOORBAL. We have received your order and our concierge will contact you on WhatsApp or phone for confirmation.
             </p>
           </div>
 
@@ -99,38 +97,6 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
             Our concierge will contact you on <strong>{order.customer.phone}</strong> to verify the parcel details before dispatch.
           </div>
 
-        </div>
-
-        {/* Database Verification Badge */}
-        <div className="p-4 rounded-2xl bg-white border border-[#E5DFD5] flex items-center justify-between text-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold shrink-0">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#2B231E]">Supabase Database Persisted</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                  LIVE
-                </span>
-              </div>
-              <p className="text-gray-500 text-[11px]">
-                Project ID: <code className="bg-gray-100 px-1 py-0.5 rounded font-mono text-[#2B231E]">alqcxfrwzklpygkegwih</code>
-                {order.supabaseId && (
-                  <> · Record ID: <span className="font-mono text-gray-600">{order.supabaseId.slice(0, 8)}...</span></>
-                )}
-              </p>
-            </div>
-          </div>
-          <span className="text-[11px] text-gray-400 hidden sm:inline">
-            {new Date(order.createdAt).toLocaleDateString(undefined, { 
-              year: 'numeric', 
-              month: 'short', 
-              day: 'numeric', 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </span>
         </div>
 
         {/* Order Details Breakdown Grid */}

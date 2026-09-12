@@ -29,7 +29,7 @@ const HERO_SLIDES = [
     image: mauveDressImg,
     tag: 'Artisan Heirloom',
     featureTitle: 'Pure Silk & Hand Needlework',
-    price: 'Dispatches in 24 Hours',
+    price: 'PKR 35,000',
   },
   {
     id: 'royal-luxury',
@@ -39,7 +39,7 @@ const HERO_SLIDES = [
     image: perfumeImg,
     tag: 'Signature Oud',
     featureTitle: 'Golden Amber & Damascus Rose',
-    price: 'PKR 14,000',
+    price: 'PKR 1,400',
   },
 ];
 

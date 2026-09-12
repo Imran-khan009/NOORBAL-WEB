@@ -96,6 +96,188 @@ interface StoredEvent {
 let storedOrders: StoredOrder[] = loadJsonFile<StoredOrder[]>(ORDERS_FILE, []);
 let storedEvents: StoredEvent[] = loadJsonFile<StoredEvent[]>(ANALYTICS_FILE, []);
 
+// Seed realistic historical operations data if empty
+if (storedOrders.length === 0) {
+  const now = Date.now();
+  storedOrders = [
+    {
+      id: 'NB-2026-48291',
+      item: {
+        productId: 'mauve-balochi-dress',
+        productName: 'Mauve Hand-Embroidered Balochi Dress',
+        size: 'Medium (M)',
+        quantity: 1,
+        unitPricePKR: 35000,
+        subtotalPKR: 35000,
+        heroImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+      },
+      deliveryFeePKR: 0,
+      totalPKR: 35000,
+      customer: {
+        fullName: 'Fatima Zahra',
+        phone: '+92 300 1234567',
+        email: 'fatima.zahra@example.com',
+        country: 'Pakistan',
+        province: 'Punjab',
+        city: 'Lahore',
+        area: 'Gulberg III',
+        address: 'House 42, Street 8, Block B',
+        postalCode: '54000',
+        orderNotes: 'Please gift wrap with handwritten card',
+      },
+      orderStatus: 'Dispatched',
+      createdAt: new Date(now - 12 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'NB-2026-39102',
+      item: {
+        productId: 'teal-balochi-3piece',
+        productName: 'Teal Hand-Embroidered Balochi 3-Piece',
+        size: 'Custom Made-to-Order',
+        quantity: 1,
+        unitPricePKR: 38000,
+        subtotalPKR: 38000,
+        heroImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+      },
+      deliveryFeePKR: 0,
+      totalPKR: 38000,
+      customer: {
+        fullName: 'Dr. Ayesha Siddiqui',
+        phone: '+92 321 9876543',
+        email: 'ayesha.s@example.com',
+        country: 'Pakistan',
+        province: 'Federal Capital',
+        city: 'Islamabad',
+        area: 'Sector F-7/2',
+        address: 'Villa 14, Hill Road',
+        postalCode: '44000',
+      },
+      orderStatus: 'In Production',
+      createdAt: new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'NB-2026-81923',
+      item: {
+        productId: 'noorbal-eau-de-parfum',
+        productName: 'NOORBAL Amber & Royal Oud Eau de Parfum',
+        size: '100ml (3.4 FL OZ)',
+        quantity: 2,
+        unitPricePKR: 1400,
+        subtotalPKR: 2800,
+        heroImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=800&q=80',
+      },
+      deliveryFeePKR: 0,
+      totalPKR: 2800,
+      customer: {
+        fullName: 'Mehmood Khan',
+        phone: '+92 333 4567890',
+        email: 'm.khan@example.com',
+        country: 'Pakistan',
+        province: 'Sindh',
+        city: 'Karachi',
+        area: 'DHA Phase 6',
+        address: 'Bungalow 18, 24th Street',
+        postalCode: '75500',
+      },
+      orderStatus: 'Confirmed',
+      createdAt: new Date(now - 4 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'NB-2026-62841',
+      item: {
+        productId: 'noorbal-moonphase-watch',
+        productName: 'NOORBAL Heritage Moonphase Horology Watch',
+        size: '40mm Dial (Unisex)',
+        quantity: 1,
+        unitPricePKR: 1850,
+        subtotalPKR: 1850,
+        heroImage: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=80',
+      },
+      deliveryFeePKR: 0,
+      totalPKR: 1850,
+      customer: {
+        fullName: 'Shahzadi Begum',
+        phone: '+92 312 3456789',
+        email: 'shahzadi.b@example.com',
+        country: 'Pakistan',
+        province: 'Balochistan',
+        city: 'Quetta',
+        area: 'Cantt',
+        address: 'Command House Road',
+        postalCode: '87300',
+      },
+      orderStatus: 'Delivered',
+      createdAt: new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'NB-2026-55920',
+      item: {
+        productId: 'noorbal-kurta-suit',
+        productName: 'NOORBAL Minimalist Kurta & Waistcoat Suit',
+        size: 'Large (L)',
+        quantity: 1,
+        unitPricePKR: 7500,
+        subtotalPKR: 7500,
+        heroImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
+      },
+      deliveryFeePKR: 0,
+      totalPKR: 7500,
+      customer: {
+        fullName: 'Bilal Mengal',
+        phone: '+92 345 6789012',
+        email: 'bilal.m@example.com',
+        country: 'Pakistan',
+        province: 'Balochistan',
+        city: 'Gwadar',
+        area: 'Port Area',
+        address: 'Marine Drive Residences',
+        postalCode: '91200',
+      },
+      orderStatus: 'Pending',
+      createdAt: new Date(now - 1 * 60 * 60 * 1000).toISOString(),
+    }
+  ];
+  saveJsonFile(ORDERS_FILE, storedOrders);
+}
+
+if (storedEvents.length === 0) {
+  const now = Date.now();
+  const seedEvents: StoredEvent[] = [];
+  const sources = ['Direct Storefront', 'WhatsApp Concierge', 'Instagram', 'Search Engine', 'Atelier Catalog'];
+  const devices: Array<'mobile' | 'desktop' | 'tablet'> = ['mobile', 'mobile', 'mobile', 'desktop', 'desktop', 'tablet'];
+  const products = [
+    { id: 'mauve-balochi-dress', name: 'Mauve Hand-Embroidered Balochi Dress' },
+    { id: 'teal-balochi-3piece', name: 'Teal Hand-Embroidered Balochi 3-Piece' },
+    { id: 'noorbal-eau-de-parfum', name: 'NOORBAL Amber & Royal Oud Eau de Parfum' },
+    { id: 'noorbal-moonphase-watch', name: 'NOORBAL Heritage Moonphase Horology Watch' },
+    { id: 'noorbal-kurta-suit', name: 'NOORBAL Minimalist Kurta & Waistcoat Suit' },
+  ];
+
+  for (let i = 0; i < 180; i++) {
+    const hoursAgo = Math.floor(Math.random() * (28 * 24));
+    const evtTime = new Date(now - hoursAgo * 3600 * 1000).toISOString();
+    const p = products[Math.floor(Math.random() * products.length)];
+    const dev = devices[Math.floor(Math.random() * devices.length)];
+    const src = sources[Math.floor(Math.random() * sources.length)];
+    const visitorNum = Math.floor(Math.random() * 45) + 1;
+    const vId = `visitor_ip_${visitorNum}`;
+
+    seedEvents.push({
+      id: `evt_seed_${i}`,
+      type: i % 4 === 0 ? 'product_view' : i % 7 === 0 ? 'cart_add' : i % 12 === 0 ? 'checkout_started' : 'page_view',
+      details: i % 4 === 0 ? `Viewed product: ${p.name}` : i % 7 === 0 ? `Added to cart: ${p.name}` : `Viewed catalog`,
+      productId: p.id,
+      productName: p.name,
+      device: dev,
+      source: src,
+      visitorId: vId,
+      timestamp: evtTime,
+    });
+  }
+  storedEvents = seedEvents.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  saveJsonFile(ANALYTICS_FILE, storedEvents);
+}
+
 // Admin credentials & auth sessions
 const ADMIN_USERNAME = (process.env.ADMIN_USERNAME || 'admin@noorbal.com').trim().toLowerCase();
 const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || 'noorbal_admin_2026').trim();

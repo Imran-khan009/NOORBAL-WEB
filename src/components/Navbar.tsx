@@ -5,7 +5,6 @@ import {
   Menu, 
   X, 
   Globe, 
-  BarChart3, 
   Sparkles, 
   ShieldCheck, 
   Truck,
@@ -30,7 +29,6 @@ interface NavbarProps {
   cartCount?: number;
   onOpenWishlist: () => void;
   onOpenCart?: () => void;
-  onOpenAnalytics: () => void;
   onSelectCategory: (categoryId: string) => void;
   onOpenSearch: () => void;
   onNavigateToStory: () => void;
@@ -44,7 +42,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   cartCount = 0,
   onOpenWishlist,
   onOpenCart,
-  onOpenAnalytics,
   onSelectCategory,
   onOpenSearch,
   onNavigateToStory,
@@ -321,18 +318,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {wishlistCount}
                 </span>
               )}
-            </button>
-
-            {/* BI Analytics Drawer (Desktop) */}
-            <button
-              id="header-bi-btn"
-              type="button"
-              onClick={onOpenAnalytics}
-              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#2B231E] hover:text-[#C9A468] bg-[#E5DFD5]/40 hover:bg-[#E5DFD5] transition-all rounded-lg border border-[#E5DFD5] active:scale-95"
-              title="Business Intelligence"
-            >
-              <BarChart3 className="w-3.5 h-3.5 text-[#C9A468]" />
-              <span className="font-sans font-medium">BI</span>
             </button>
 
           </div>

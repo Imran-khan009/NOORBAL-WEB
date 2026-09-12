@@ -15,12 +15,14 @@ interface FooterProps {
   onSelectCategory: (categoryId: string) => void;
   onNavigateToStory: () => void;
   onNavigateToConnect?: () => void;
+  onNavigateToAdmin?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onSelectCategory,
   onNavigateToStory,
   onNavigateToConnect,
+  onNavigateToAdmin,
 }) => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -253,9 +255,17 @@ export const Footer: React.FC<FooterProps> = ({
             <span>·</span>
             <button
               onClick={scrollToConnect}
-              className="hover:text-[#DFBF88] transition-colors"
+              className="hover:text-[#DFBF88] transition-colors cursor-pointer"
             >
               Social Hub
+            </button>
+            <span>·</span>
+            <button
+              onClick={onNavigateToAdmin}
+              className="hover:text-[#C9A468] text-white/30 transition-colors cursor-pointer"
+              title="Restricted Administrative Console"
+            >
+              Staff Portal
             </button>
             <span>·</span>
             <span>Made with Heritage in Pakistan</span>
