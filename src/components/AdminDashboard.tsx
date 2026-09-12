@@ -25,6 +25,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { NoorbalLogo } from './NoorbalLogo';
+import { getApiUrl, safeJsonFetch } from '../utils/api';
 
 interface AdminDashboardProps {
   onBackToStore: () => void;
@@ -114,8 +115,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || null;
   });
 
-  const [usernameInput, setUsernameInput] = useState('admin@noorbal.com');
-  const [passwordInput, setPasswordInput] = useState('noorbal_admin_2026');
+  const [usernameInput, setUsernameInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -139,7 +140,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       setIsLoadingData(true);
       try {
         // Verify token
-        const verifyRes = await fetch('/api/admin/verify', {
+        const verifyRes = await fetch(getApiUrl('/api/admin/verify'), {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -152,7 +153,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
         }
 
         // Fetch Analytics
-        const analyticsRes = await fetch(`/api/admin/analytics?range=${dateRange}`, {
+        const analyticsRes = await fetch(getApiUrl(`/api/admin/analytics?range=${dateRange}`), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (analyticsRes.ok) {
@@ -163,7 +164,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
         }
 
         // Fetch Orders
-        const ordersRes = await fetch('/api/admin/orders', {
+        const ordersRes = await fetch(getApiUrl('/api/admin/orders'), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (ordersRes.ok) {
@@ -192,14 +193,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     setIsLoggingIn(true);
 
     try {
-      const res = await fetch('/api/admin/login', {
+      const loginUrl = getApiUrl('/api/admin/login');
+      const res = await fetch(loginUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: JSON.stringify({
           username: usernameInput.trim(),
           password: passwordInput.trim(),
         }),
       });
+
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await res.text();
+        if (text.includes('<!doctype') || text.includes('<html')) {
+          setLoginError('The server returned an HTML document instead of JSON. Ensure your Netlify Function or backend API is active.');
+        } else {
+          setLoginError(`Server returned unexpected response (status ${res.status}).`);
+        }
+        return;
+      }
 
       const data = await res.json();
       if (res.ok && data.success && data.token) {
@@ -209,8 +225,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       } else {
         setLoginError(data.error || 'Invalid credentials. Please verify your username and password.');
       }
-    } catch {
-      setLoginError('Unable to connect to administrative server. Please try again.');
+    } catch (err: any) {
+      console.error('Admin login connection error:', err);
+      setLoginError(
+        err?.message && !err.message.includes('fetch')
+          ? `Connection error: ${err.message}`
+          : 'Unable to connect to administrative server. Please try again.'
+      );
     } finally {
       setIsLoggingIn(false);
     }
@@ -219,7 +240,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
   const handleLogout = async () => {
     if (token) {
       try {
-        await fetch('/api/admin/logout', {
+        await fetch(getApiUrl('/api/admin/logout'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -238,7 +259,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     if (!token) return;
     setStatusUpdatingId(orderId);
     try {
-      const res = await fetch(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
+      const res = await fetch(getApiUrl(`/api/admin/orders/${encodeURIComponent(orderId)}/status`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -264,10 +285,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     setIsLoadingData(true);
     try {
       const [analyticsRes, ordersRes] = await Promise.all([
-        fetch(`/api/admin/analytics?range=${dateRange}`, {
+        fetch(getApiUrl(`/api/admin/analytics?range=${dateRange}`), {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch('/api/admin/orders', {
+        fetch(getApiUrl('/api/admin/orders'), {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -345,13 +366,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
               <div className="space-y-1">
                 <label className="text-xs font-medium text-[#DFBF88] flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5 text-[#C9A468]" />
-                  <span>Admin Email</span>
+                  <span>Admin Username</span>
                 </label>
                 <input
                   type="text"
                   value={usernameInput}
                   onChange={(e) => setUsernameInput(e.target.value)}
-                  placeholder="admin@noorbal.com"
+                  placeholder="Enter admin username"
                   required
                   className="w-full py-2.5 px-3 bg-[#1A1614] border border-[#C9A468]/30 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#C9A468] transition-colors"
                 />
@@ -390,25 +411,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                 )}
               </button>
             </form>
-
-            <div className="pt-2 border-t border-white/10 space-y-3">
-              <div className="flex items-center justify-between text-[11px] text-[#FAF8F5]/60 font-sans">
-                <span>Default Credentials Preloaded</span>
-                <span className="text-[#C9A468]">admin@noorbal.com</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsernameInput('admin@noorbal.com');
-                  setPasswordInput('noorbal_admin_2026');
-                  handleLogin();
-                }}
-                className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs text-[#DFBF88] font-sans font-medium transition-colors cursor-pointer"
-              >
-                Fast One-Click Demo Sign-in
-              </button>
-            </div>
-
           </div>
         </main>
 

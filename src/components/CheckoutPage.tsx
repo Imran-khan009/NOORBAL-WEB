@@ -4,6 +4,7 @@ import { PAKISTAN_PROVINCES } from '../data/pakistanRegions';
 import { formatPrice } from '../utils/currency';
 import { generateOrderNumber } from '../utils/orders';
 import { buildOrderInquiryWhatsAppUrl } from '../utils/whatsapp';
+import { getApiUrl } from '../utils/api';
 import { WhatsAppIcon } from './WhatsAppIcon';
 import { 
   ArrowLeft, 
@@ -169,7 +170,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     const orderNumber = generateOrderNumber();
 
     try {
-      const response = await fetch('/api/orders', {
+      const response = await fetch(getApiUrl('/api/orders'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

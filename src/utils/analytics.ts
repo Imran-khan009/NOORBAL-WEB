@@ -1,4 +1,5 @@
 import { AnalyticsEvent } from '../types';
+import { getApiUrl } from './api';
 
 /**
  * Client-Side Anonymous Activity Beacon
@@ -20,11 +21,13 @@ export function trackEvent(
       path: typeof window !== 'undefined' ? (window.location.pathname + window.location.hash) : '',
     };
 
+    const targetUrl = getApiUrl('/api/analytics/event');
+
     if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
       const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      navigator.sendBeacon('/api/analytics/event', blob);
+      navigator.sendBeacon(targetUrl, blob);
     } else {
-      fetch('/api/analytics/event', {
+      fetch(targetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
