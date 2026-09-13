@@ -1,5 +1,52 @@
 [
   {
+    "id": "evt_bbtmhym",
+    "type": "order_placed",
+    "details": "Order placed: NB-2026-49467 (Chikan & Marri Embroidered Pashmina Poshak)",
+    "productId": "nb-chikan-poshak",
+    "productName": "Chikan & Marri Embroidered Pashmina Poshak",
+    "device": "desktop",
+    "source": "Direct Storefront",
+    "visitorId": "127.0.0.1",
+    "timestamp": "2026-09-13T19:35:51.690Z"
+  },
+  {
+    "id": "evt_1cqi6x1",
+    "type": "page_view",
+    "details": "Customer visited NOORBAL storefront",
+    "device": "desktop",
+    "source": "Search Engine",
+    "visitorId": "223.123.119.68, 169.254.169.126_Mozilla/5.0 (Windows NT 10.0; ",
+    "timestamp": "2026-09-13T19:02:40.750Z"
+  },
+  {
+    "id": "evt_otivuor",
+    "type": "page_view",
+    "details": "Customer visited NOORBAL storefront",
+    "device": "desktop",
+    "source": "Search Engine",
+    "visitorId": "223.123.119.68, 169.254.169.126_Mozilla/5.0 (Windows NT 10.0; ",
+    "timestamp": "2026-09-13T19:02:40.747Z"
+  },
+  {
+    "id": "evt_ot0clrx",
+    "type": "page_view",
+    "details": "Customer visited NOORBAL storefront",
+    "device": "desktop",
+    "source": "Search Engine",
+    "visitorId": "223.123.119.68, 169.254.169.126_Mozilla/5.0 (Windows NT 10.0; ",
+    "timestamp": "2026-09-13T19:01:37.983Z"
+  },
+  {
+    "id": "evt_0yywoca",
+    "type": "page_view",
+    "details": "Customer visited NOORBAL storefront",
+    "device": "desktop",
+    "source": "Search Engine",
+    "visitorId": "223.123.119.68, 169.254.169.126_Mozilla/5.0 (Windows NT 10.0; ",
+    "timestamp": "2026-09-13T19:01:37.492Z"
+  },
+  {
     "id": "evt_vo6d2uy",
     "type": "order_placed",
     "details": "Order placed: NB-2026-TEST1 (NOORBAL Amber & Royal Oud Eau de Parfum)",

@@ -824,34 +824,40 @@ apiRouter.post('/orders', async (req, res) => {
     let supabaseRecordId: string | undefined;
 
     try {
+      const dbRow = {
+        order_number: finalOrderNumber,
+        customer_name: customer.fullName.trim(),
+        mobile_number: customer.phone.trim(),
+        email: customer.email?.trim() || null,
+        complete_address: customer.address.trim(),
+        province: customer.province || 'Sindh',
+        city: customer.city.trim(),
+        area: customer.area?.trim() || '',
+        postal_code: customer.postalCode?.trim() || '',
+        product_id: item.productId,
+        product_name: item.productName,
+        size_variant: item.size || 'Standard',
+        quantity: item.quantity || 1,
+        price: item.unitPricePKR,
+        delivery_fee: deliveryFeePKR,
+        total: total,
+        order_notes: customer.orderNotes?.trim() || null,
+        order_status: 'Pending',
+        order_date: createdAt,
+      };
+
+      // 1. Attempt insert with select('id') if service role or permission allows
       const { data: sbData, error: sbError } = await supabase
         .from('orders')
-        .insert([{
-          order_number: finalOrderNumber,
-          customer_name: customer.fullName.trim(),
-          mobile_number: customer.phone.trim(),
-          email: customer.email?.trim() || null,
-          complete_address: customer.address.trim(),
-          province: customer.province || 'Sindh',
-          city: customer.city.trim(),
-          area: customer.area?.trim() || '',
-          postal_code: customer.postalCode?.trim() || '',
-          product_id: item.productId,
-          product_name: item.productName,
-          size_variant: item.size || 'Standard',
-          quantity: item.quantity || 1,
-          price: item.unitPricePKR,
-          delivery_fee: deliveryFeePKR,
-          total: total,
-          order_notes: customer.orderNotes?.trim() || null,
-          order_status: 'Pending',
-          order_date: createdAt,
-        }])
+        .insert([dbRow])
         .select('id')
         .single();
 
       if (!sbError && sbData?.id) {
         supabaseRecordId = sbData.id;
+      } else if (sbError) {
+        // 2. Strict RLS fallback: pure insert without RETURNING clause
+        await supabase.from('orders').insert([dbRow]);
       }
     } catch {
       // Handled cleanly on server
@@ -920,25 +926,23 @@ apiRouter.post('/orders', async (req, res) => {
   }
 });
 
-// Public Order Tracking Lookup (Privacy-compliant: no sensitive customer personal data exposed)
+// Public Order Tracking Lookup (Privacy-compliant: strictly minimal tracking milestones, zero customer PII)
 apiRouter.get('/orders/:orderNumber/track', async (req, res) => {
   try {
     const rawOrderNum = (req.params.orderNumber || '').trim();
-    if (!rawOrderNum) {
-      return res.status(400).json({ success: false, error: 'Order number is required' });
+    if (!rawOrderNum || rawOrderNum.length < 4) {
+      return res.status(400).json({ success: false, error: 'A valid order number is required' });
     }
 
-    // 1. Search in Supabase first
     let matchedOrder: any = null;
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .or(`order_number.ilike.%${rawOrderNum}%,mobile_number.ilike.%${rawOrderNum}%`)
-        .limit(1);
 
-      if (!error && data && data.length > 0) {
-        const o = data[0];
+    // 1. Try secure tracking RPC first (Data Minimization: returns only fulfillment columns)
+    try {
+      const { data: rpcData, error: rpcError } = await supabase
+        .rpc('get_order_tracking', { p_order_number: rawOrderNum });
+
+      if (!rpcError && rpcData && rpcData.length > 0) {
+        const o = rpcData[0];
         matchedOrder = {
           id: o.order_number,
           productName: o.product_name,
@@ -947,23 +951,48 @@ apiRouter.get('/orders/:orderNumber/track', async (req, res) => {
           status: o.order_status || 'Pending',
           city: o.city,
           province: o.province,
-          totalPKR: o.total,
           createdAt: o.order_date || o.created_at,
           courier: 'Trax Express / TCS',
           trackingNumber: `TRX-${(o.order_number || '').replace(/[^0-9]/g, '').slice(-6) || '982314'}`,
         };
       }
     } catch {
-      // Handled cleanly
+      // RPC may not be deployed yet; fallback to direct exact query
     }
 
-    // 2. If not in Supabase, search local disk store
+    // 2. Direct exact query if service_role or elevated access is active
+    if (!matchedOrder) {
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('order_number, product_name, size_variant, quantity, order_status, city, province, order_date, created_at')
+          .ilike('order_number', rawOrderNum)
+          .limit(1);
+
+        if (!error && data && data.length > 0) {
+          const o = data[0];
+          matchedOrder = {
+            id: o.order_number,
+            productName: o.product_name,
+            quantity: o.quantity || 1,
+            size: o.size_variant || 'Standard',
+            status: o.order_status || 'Pending',
+            city: o.city,
+            province: o.province,
+            createdAt: o.order_date || o.created_at,
+            courier: 'Trax Express / TCS',
+            trackingNumber: `TRX-${(o.order_number || '').replace(/[^0-9]/g, '').slice(-6) || '982314'}`,
+          };
+        }
+      } catch {
+        // Handled cleanly
+      }
+    }
+
+    // 3. Fallback to local server persistent disk store by exact order ID
     if (!matchedOrder) {
       const found = storedOrders.find(
-        (o) =>
-          o.id.toLowerCase() === rawOrderNum.toLowerCase() ||
-          o.id.toLowerCase().includes(rawOrderNum.toLowerCase()) ||
-          o.customer?.phone?.includes(rawOrderNum)
+        (o) => o.id.trim().toUpperCase() === rawOrderNum.toUpperCase()
       );
 
       if (found) {
@@ -975,7 +1004,6 @@ apiRouter.get('/orders/:orderNumber/track', async (req, res) => {
           status: found.orderStatus || 'Pending',
           city: found.customer.city,
           province: found.customer.province,
-          totalPKR: found.totalPKR,
           createdAt: found.createdAt,
           courier: 'Trax Express / TCS',
           trackingNumber: `TRX-${found.id.replace(/[^0-9]/g, '').slice(-6) || '482019'}`,
@@ -983,23 +1011,7 @@ apiRouter.get('/orders/:orderNumber/track', async (req, res) => {
       }
     }
 
-    // 3. Illustrative simulated order for demo codes
-    if (!matchedOrder && rawOrderNum.toUpperCase().startsWith('NB-')) {
-      matchedOrder = {
-        id: rawOrderNum.toUpperCase(),
-        productName: 'Chikan & Marri Embroidered Pashmina Poshak',
-        quantity: 1,
-        size: 'Medium',
-        status: 'in_production',
-        city: 'Lahore',
-        province: 'Punjab',
-        totalPKR: 18500,
-        createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-        courier: 'Trax Express',
-        trackingNumber: `TRX-${rawOrderNum.replace(/[^0-9]/g, '').slice(-6) || '772104'}`,
-      };
-    }
-
+    // 4. Return 404 if no real order exists (No fake data generated)
     if (!matchedOrder) {
       return res.status(404).json({
         success: false,

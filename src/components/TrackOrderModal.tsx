@@ -81,12 +81,6 @@ export const TrackOrderModal: React.FC<TrackOrderModalProps> = ({
     }
   };
 
-  const handleSampleDemo = () => {
-    const demoId = 'NB-2026-89412';
-    setOrderQuery(demoId);
-    handleTrack(demoId);
-  };
-
   const getStatusStepIndex = (statusStr: string = '') => {
     const s = statusStr.toLowerCase();
     if (s.includes('deliver') || s.includes('complete')) return 4;
@@ -173,17 +167,10 @@ export const TrackOrderModal: React.FC<TrackOrderModalProps> = ({
               </button>
             </div>
 
-            {/* Quick Demo Trigger */}
-            <div className="mt-2 flex items-center justify-between text-[11px] text-[#8D7B68]">
-              <span>Sample order code available</span>
-              <button
-                type="button"
-                onClick={handleSampleDemo}
-                className="text-[#C9A468] font-semibold hover:underline cursor-pointer"
-              >
-                Try Sample: NB-2026-89412
-              </button>
-            </div>
+          {/* Form helper note */}
+          <div className="text-[11px] text-[#8D7B68] -mt-3">
+            Enter your unique order number provided upon checkout (e.g. NB-2026-XXXXX).
+          </div>
           </div>
 
           {/* Error Notice */}
