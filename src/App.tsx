@@ -13,6 +13,7 @@ import { WishlistDrawer } from './components/WishlistDrawer';
 import { CartDrawer } from './components/CartDrawer';
 import { AdminDashboard } from './components/AdminDashboard';
 import { SearchModal } from './components/SearchModal';
+import { TrackOrderModal } from './components/TrackOrderModal';
 import { FloatingWhatsAppCTA } from './components/FloatingWhatsAppCTA';
 import { BottomNavigation } from './components/BottomNavigation';
 import { Footer } from './components/Footer';
@@ -51,6 +52,7 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
 
   // Dedicated Admin Route State
   const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
@@ -359,6 +361,7 @@ export default function App() {
         onOpenSearch={() => setIsSearchOpen(true)}
         onNavigateToStory={handleNavigateToStory}
         onNavigateToConnect={handleNavigateToConnect}
+        onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
       />
 
       {/* Main Content Router with Cinematic Page Transition */}
@@ -438,6 +441,7 @@ export default function App() {
         onNavigateToStory={handleNavigateToStory}
         onNavigateToConnect={handleNavigateToConnect}
         onNavigateToAdmin={handleNavigateToAdmin}
+        onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
       />
 
       {/* Persistent Floating WhatsApp Concierge Support (Safe above mobile bottom nav) */}
@@ -504,6 +508,12 @@ export default function App() {
         products={PRODUCTS}
         currency={currency}
         onSelectProduct={handleQuickView}
+      />
+
+      {/* Track Order Modal */}
+      <TrackOrderModal
+        isOpen={isTrackOrderOpen}
+        onClose={() => setIsTrackOrderOpen(false)}
       />
 
     </div>

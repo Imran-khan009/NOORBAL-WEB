@@ -25,7 +25,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { NoorbalLogo } from './NoorbalLogo';
-import { getApiUrl, safeJsonFetch } from '../utils/api';
+import { getApiUrl, safeJsonFetch, apiFetch } from '../utils/api';
 
 interface AdminDashboardProps {
   onBackToStore: () => void;
@@ -140,7 +140,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
       setIsLoadingData(true);
       try {
         // Verify token
-        const verifyRes = await fetch(getApiUrl('/api/admin/verify'), {
+        const verifyRes = await apiFetch('/api/admin/verify', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -153,24 +153,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
         }
 
         // Fetch Analytics
-        const analyticsRes = await fetch(getApiUrl(`/api/admin/analytics?range=${dateRange}`), {
+        const analyticsRes = await apiFetch(`/api/admin/analytics?range=${dateRange}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (analyticsRes.ok) {
-          const aData = await analyticsRes.json();
-          if (isMounted && aData.success) {
-            setAnalytics(aData);
+          const contentType = analyticsRes.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const aData = await analyticsRes.json();
+            if (isMounted && aData.success) {
+              setAnalytics(aData);
+            }
           }
         }
 
         // Fetch Orders
-        const ordersRes = await fetch(getApiUrl('/api/admin/orders'), {
+        const ordersRes = await apiFetch('/api/admin/orders', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (ordersRes.ok) {
-          const oData = await ordersRes.json();
-          if (isMounted && oData.success) {
-            setOrders(oData.orders || []);
+          const contentType = ordersRes.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const oData = await ordersRes.json();
+            if (isMounted && oData.success) {
+              setOrders(oData.orders || []);
+            }
           }
         }
       } catch (err) {
@@ -193,8 +199,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     setIsLoggingIn(true);
 
     try {
-      const loginUrl = getApiUrl('/api/admin/login');
-      const res = await fetch(loginUrl, {
+      const res = await apiFetch('/api/admin/login', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -240,7 +245,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
   const handleLogout = async () => {
     if (token) {
       try {
-        await fetch(getApiUrl('/api/admin/logout'), {
+        await apiFetch('/api/admin/logout', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -259,7 +264,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     if (!token) return;
     setStatusUpdatingId(orderId);
     try {
-      const res = await fetch(getApiUrl(`/api/admin/orders/${encodeURIComponent(orderId)}/status`), {
+      const res = await apiFetch(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -285,21 +290,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
     setIsLoadingData(true);
     try {
       const [analyticsRes, ordersRes] = await Promise.all([
-        fetch(getApiUrl(`/api/admin/analytics?range=${dateRange}`), {
+        apiFetch(`/api/admin/analytics?range=${dateRange}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(getApiUrl('/api/admin/orders'), {
+        apiFetch('/api/admin/orders', {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
 
       if (analyticsRes.ok) {
-        const aData = await analyticsRes.json();
-        if (aData.success) setAnalytics(aData);
+        const contentType = analyticsRes.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const aData = await analyticsRes.json();
+          if (aData.success) setAnalytics(aData);
+        }
       }
       if (ordersRes.ok) {
-        const oData = await ordersRes.json();
-        if (oData.success) setOrders(oData.orders || []);
+        const contentType = ordersRes.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const oData = await ordersRes.json();
+          if (oData.success) setOrders(oData.orders || []);
+        }
       }
     } finally {
       setIsLoadingData(false);

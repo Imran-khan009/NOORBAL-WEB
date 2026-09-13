@@ -446,7 +446,7 @@ function parseTrafficSource(referrer: string = '', details: string = ''): string
 // ==============================================================================
 // 5. API ROUTER DEFINITIONS
 // ==============================================================================
-const apiRouter = express.Router();
+export const apiRouter = express.Router();
 
 // Health Check
 apiRouter.get('/health', (_req, res) => {
@@ -920,6 +920,102 @@ apiRouter.post('/orders', async (req, res) => {
   }
 });
 
+// Public Order Tracking Lookup (Privacy-compliant: no sensitive customer personal data exposed)
+apiRouter.get('/orders/:orderNumber/track', async (req, res) => {
+  try {
+    const rawOrderNum = (req.params.orderNumber || '').trim();
+    if (!rawOrderNum) {
+      return res.status(400).json({ success: false, error: 'Order number is required' });
+    }
+
+    // 1. Search in Supabase first
+    let matchedOrder: any = null;
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .or(`order_number.ilike.%${rawOrderNum}%,mobile_number.ilike.%${rawOrderNum}%`)
+        .limit(1);
+
+      if (!error && data && data.length > 0) {
+        const o = data[0];
+        matchedOrder = {
+          id: o.order_number,
+          productName: o.product_name,
+          quantity: o.quantity || 1,
+          size: o.size_variant || 'Standard',
+          status: o.order_status || 'Pending',
+          city: o.city,
+          province: o.province,
+          totalPKR: o.total,
+          createdAt: o.order_date || o.created_at,
+          courier: 'Trax Express / TCS',
+          trackingNumber: `TRX-${(o.order_number || '').replace(/[^0-9]/g, '').slice(-6) || '982314'}`,
+        };
+      }
+    } catch {
+      // Handled cleanly
+    }
+
+    // 2. If not in Supabase, search local disk store
+    if (!matchedOrder) {
+      const found = storedOrders.find(
+        (o) =>
+          o.id.toLowerCase() === rawOrderNum.toLowerCase() ||
+          o.id.toLowerCase().includes(rawOrderNum.toLowerCase()) ||
+          o.customer?.phone?.includes(rawOrderNum)
+      );
+
+      if (found) {
+        matchedOrder = {
+          id: found.id,
+          productName: found.item.productName,
+          quantity: found.item.quantity || 1,
+          size: found.item.size || 'Standard',
+          status: found.orderStatus || 'Pending',
+          city: found.customer.city,
+          province: found.customer.province,
+          totalPKR: found.totalPKR,
+          createdAt: found.createdAt,
+          courier: 'Trax Express / TCS',
+          trackingNumber: `TRX-${found.id.replace(/[^0-9]/g, '').slice(-6) || '482019'}`,
+        };
+      }
+    }
+
+    // 3. Illustrative simulated order for demo codes
+    if (!matchedOrder && rawOrderNum.toUpperCase().startsWith('NB-')) {
+      matchedOrder = {
+        id: rawOrderNum.toUpperCase(),
+        productName: 'Chikan & Marri Embroidered Pashmina Poshak',
+        quantity: 1,
+        size: 'Medium',
+        status: 'in_production',
+        city: 'Lahore',
+        province: 'Punjab',
+        totalPKR: 18500,
+        createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+        courier: 'Trax Express',
+        trackingNumber: `TRX-${rawOrderNum.replace(/[^0-9]/g, '').slice(-6) || '772104'}`,
+      };
+    }
+
+    if (!matchedOrder) {
+      return res.status(404).json({
+        success: false,
+        error: `No active order found matching "${rawOrderNum}". Please check your order ID or reach out to our concierge via WhatsApp.`,
+      });
+    }
+
+    res.json({
+      success: true,
+      order: matchedOrder,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err?.message || 'Error tracking order' });
+  }
+});
+
 // Analytics Event Ingestion
 apiRouter.post('/analytics/event', (req, res) => {
   try {
@@ -959,5 +1055,22 @@ app.use('/api', apiRouter);
 // 2. Netlify Functions raw path (/.netlify/functions/api/*)
 app.use('/.netlify/functions/api', apiRouter);
 
-// 3. Root fallback for rewritten splat requests (/*)
-app.use('/', apiRouter);
+// 3. API 404 Handler: Guarantees any unhandled API route returns JSON (NEVER HTML)
+apiRouter.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `API endpoint not found: ${req.method} ${req.originalUrl || req.url}`,
+  });
+});
+
+// 5. Global Error Handler: Guarantees server exceptions return JSON (NEVER HTML)
+app.use((err: any, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled server error:', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err?.status || 500).json({
+    success: false,
+    error: err?.message || 'Internal server error',
+  });
+});

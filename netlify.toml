@@ -8,11 +8,16 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # 1. API Route Redirection: Forward all /api/* requests to Netlify Serverless Function
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
+  force = true
 
 # 2. SPA Fallback: Ensures customer & admin routes load /index.html cleanly without 404
 [[redirects]]
@@ -23,6 +28,14 @@
 # API security and CORS headers
 [[headers]]
   for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+
+# Netlify functions security and CORS headers
+[[headers]]
+  for = "/.netlify/functions/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept, Authorization"

@@ -4,7 +4,8 @@ import {
   ShieldCheck, 
   ArrowRight, 
   Sparkles,
-  Check
+  Check,
+  Package
 } from 'lucide-react';
 import { socialLinks, SOCIAL_CHANNELS } from '../config/socialLinks';
 import { getPlatformIcon } from './SocialIcons';
@@ -16,6 +17,7 @@ interface FooterProps {
   onNavigateToStory: () => void;
   onNavigateToConnect?: () => void;
   onNavigateToAdmin?: () => void;
+  onOpenTrackOrder?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -23,6 +25,7 @@ export const Footer: React.FC<FooterProps> = ({
   onNavigateToStory,
   onNavigateToConnect,
   onNavigateToAdmin,
+  onOpenTrackOrder,
 }) => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -189,6 +192,19 @@ export const Footer: React.FC<FooterProps> = ({
                   </a>
                 </span>
               </li>
+              {onOpenTrackOrder && (
+                <li className="pt-1">
+                  <button
+                    id="footer-track-order-btn"
+                    type="button"
+                    onClick={onOpenTrackOrder}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#C9A468] hover:text-[#2B231E] text-[#DFBF88] text-xs font-medium transition-all group"
+                  >
+                    <Package className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                    <span>Track Order Nationwide →</span>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
 

@@ -8,6 +8,7 @@ import {
   Sparkles, 
   ShieldCheck, 
   Truck,
+  Package,
   ChevronRight,
   Home,
   ShoppingBag,
@@ -33,6 +34,7 @@ interface NavbarProps {
   onOpenSearch: () => void;
   onNavigateToStory: () => void;
   onNavigateToConnect?: () => void;
+  onOpenTrackOrder?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -46,6 +48,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSearch,
   onNavigateToStory,
   onNavigateToConnect,
+  onOpenTrackOrder,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
@@ -132,15 +135,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>7 Days Return</span>
             </span>
             <span className="text-white/30">·</span>
-            <a
-              href={socialLinks.whatsapp}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-white/90 hover:text-[#25D366] transition-colors active:scale-95"
+            <button
+              id="header-track-order-btn"
+              type="button"
+              onClick={onOpenTrackOrder}
+              className="inline-flex items-center gap-1.5 text-white/90 hover:text-[#C9A468] transition-colors active:scale-95 cursor-pointer group"
+              title="Track your order status nationwide"
             >
-              <WhatsAppBrandIcon className="w-3 h-3 text-[#25D366]" />
-              <span>WhatsApp Concierge</span>
-            </a>
+              <Package className="w-3 h-3 text-[#C9A468] group-hover:scale-110 transition-transform" />
+              <span className="underline-offset-2 group-hover:underline font-semibold">Track Order</span>
+            </button>
           </div>
 
           <div className="hidden md:flex items-center gap-3 text-white/75 shrink-0 text-[11px]">
@@ -459,6 +463,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-[#C9A468]" />
                   <span>Contact</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-[#C9A468] transition-colors" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (onOpenTrackOrder) onOpenTrackOrder();
+                }}
+                className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition-all flex items-center justify-between text-sm font-medium text-white/90 hover:text-white group"
+              >
+                <span className="flex items-center gap-3">
+                  <Package className="w-4 h-4 text-[#C9A468]" />
+                  <span>Track Order</span>
                 </span>
                 <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-[#C9A468] transition-colors" />
               </button>
