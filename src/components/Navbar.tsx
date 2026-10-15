@@ -52,20 +52,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  // Smooth header compression on scroll down, returns on scroll up
+  // Subtle elevation on scroll - strictly rock-solid without layout height shift or vibration
   useEffect(() => {
-    let lastScrollY = window.scrollY;
-    
+    let ticking = false;
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > 45 && currentScrollY > lastScrollY) {
-        setIsScrolledDown(true); // scrolling down
-      } else if (currentScrollY < lastScrollY || currentScrollY <= 20) {
-        setIsScrolledDown(false); // scrolling up or at top
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 15);
+          ticking = false;
+        });
+        ticking = true;
       }
-      lastScrollY = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -115,14 +114,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#FAF8F5]/98 backdrop-blur-md border-b border-[#E5DFD5] transition-all duration-300">
+    <header className={`sticky top-0 z-40 w-full bg-[#FAF8F5]/98 backdrop-blur-md border-b border-[#E5DFD5] transition-shadow duration-200 ${isScrolled ? 'shadow-xs' : ''}`}>
       
-      {/* Top Announcement Strip - Extremely Compact & Smoothly Compressing */}
-      <div 
-        className={`bg-[#2B231E] text-[#FAF8F5] transition-all duration-300 border-b border-[#C9A468]/20 overflow-hidden ${
-          isScrolledDown ? 'max-h-0 py-0 opacity-0' : 'max-h-10 py-1.5 opacity-100'
-        }`}
-      >
+      {/* Top Announcement Strip - Rock-solid, non-jittering compact bar */}
+      <div className="bg-[#2B231E] text-[#FAF8F5] border-b border-[#C9A468]/20 py-1.5 overflow-hidden">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 text-[10px] sm:text-[11px] font-sans font-medium tracking-wider uppercase">
           <div className="flex items-center gap-2 sm:gap-3 mx-auto sm:mx-0 whitespace-nowrap">
             <span className="inline-flex items-center gap-1 text-[#C9A468]">
@@ -159,9 +154,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Main Header Bar - 56px to 64px Tall */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className={`flex items-center justify-between transition-all duration-300 ${isScrolledDown ? 'h-14 sm:h-15' : 'h-15 sm:h-16'}`}>
+      {/* Main Header Bar - Permanent rock-solid 64px height, zero shake */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 w-full select-none">
+        <div className="flex items-center justify-between h-16 w-full">
           
           {/* Mobile Menu Trigger (☰) */}
           <div className="flex items-center lg:hidden">
